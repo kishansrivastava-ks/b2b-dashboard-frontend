@@ -10,7 +10,7 @@ import api from '@/services/api'
 import { useQueryClient } from '@tanstack/react-query'
 
 const BookingContainer = styled.div`
-  min-height: 100vh;
+  min-height: 80vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
   position: relative;
@@ -20,18 +20,6 @@ const BookingContainer = styled.div`
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-
-  /* &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
-    pointer-events: none;
-  } */
 
   @keyframes rotate {
     0% {
@@ -47,7 +35,7 @@ const ContentWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 80vh;
   position: relative;
   z-index: 1;
 `
@@ -434,7 +422,7 @@ const ProfileNote = styled(motion.div)`
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-radius: 24px;
+  /* border-radius: 24px; */
   padding: 3rem;
   box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.15),
@@ -575,7 +563,7 @@ const BookService = () => {
               information.
             </p>
             <CompleteProfileButton
-              onClick={() => navigate('/update-profile')}
+              onClick={() => navigate('/dashboard/update-profile')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
