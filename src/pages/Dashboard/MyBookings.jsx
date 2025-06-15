@@ -571,7 +571,7 @@ const MyBookings = () => {
               <h3>No Bookings Yet</h3>
               <p>You haven't made any bookings yet. Start by booking your first service!</p>
               <ViewButton
-                onClick={() => navigate('/dashbord/book-service')}
+                onClick={() => navigate('/dashboard/book-service')}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
