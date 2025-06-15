@@ -394,7 +394,7 @@ const Profile = () => {
             Change Password
           </ActionButton>
           <ActionButton
-            onClick={() => toast('Update Profile clicked')}
+            onClick={() => navigate('/dashboard/update-profile')}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

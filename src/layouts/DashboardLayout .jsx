@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LogOutIcon, MenuIcon, UserIcon, ChevronRightIcon } from 'lucide-react'
+import { LogOutIcon, MenuIcon, UserIcon, ChevronRightIcon, BookIcon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
@@ -314,6 +314,47 @@ const DashboardLayout = () => {
                     transition={{ duration: 0.2 }}
                   >
                     Profile
+                  </NavText>
+                )}
+              </AnimatePresence>
+              {!sidebarCollapsed && (
+                <NavArrow>
+                  <ChevronRightIcon size={16} />
+                </NavArrow>
+              )}
+            </NavItem>
+            <NavItem to="/dashboard/book-service">
+              <BookIcon />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <NavText
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Book Service
+                  </NavText>
+                )}
+              </AnimatePresence>
+              {!sidebarCollapsed && (
+                <NavArrow>
+                  <ChevronRightIcon size={16} />
+                </NavArrow>
+              )}
+            </NavItem>
+
+            <NavItem to="/dashboard/my-bookings">
+              <BookIcon />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <NavText
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    My Bookings
                   </NavText>
                 )}
               </AnimatePresence>

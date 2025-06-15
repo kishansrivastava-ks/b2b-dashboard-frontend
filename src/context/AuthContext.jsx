@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         logout: logoutMutation.mutateAsync,
         signup: signupMutation.mutateAsync,
         changePassword: changePasswordMutation.mutateAsync,
+        setUser,
       }}
     >
       {children}
