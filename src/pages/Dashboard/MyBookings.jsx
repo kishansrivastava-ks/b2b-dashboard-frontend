@@ -415,6 +415,89 @@ const LoadingSpinner = styled.div`
     }
   }
 `
+const StatusBadge = styled(motion.div)`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  ${(props) => {
+    switch (props.status) {
+      case 'in progress':
+        return `
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          // color: #92400e;
+          box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        `
+      case 'vendor assigned':
+        return `
+          background: linear-gradient(135deg, #60a5fa, #3b82f6);
+          // color: #1e40af;
+          box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+        `
+      case 'work in progress':
+        return `
+          background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+          // color: #5b21b6;
+          box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3);
+        `
+      case 'completed':
+        return `
+          background: linear-gradient(135deg, #34d399, #10b981);
+          // color: #065f46;
+          box-shadow: 0 2px 8px rgba(52, 211, 153, 0.3);
+        `
+      default:
+        return `
+          background: linear-gradient(135deg, #9ca3af, #6b7280);
+          // color: #374151;
+          box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3);
+        `
+    }
+  }}
+
+  color: white;
+
+  &:hover::before {
+    left: 100%;
+  }
+`
+
+const StatusDot = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: ${(props) => (props.status === 'work in progress' ? 'pulse 2s infinite' : 'none')};
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+`
 
 const MyBookings = () => {
   const navigate = useNavigate()
@@ -601,7 +684,7 @@ const MyBookings = () => {
                     <option value="upcoming">Upcoming</option>
                     <option value="past">Past</option>
                   </FilterSelect>
-                  <FilterSelect
+                  {/* <FilterSelect
                     value={customerFilter}
                     onChange={(e) => setCustomerFilter(e.target.value)}
                     whileFocus={{ scale: 1.02 }}
@@ -609,7 +692,7 @@ const MyBookings = () => {
                     <option value="all">All Customers</option>
                     <option value="new">New Customers</option>
                     <option value="existing">Existing Customers</option>
-                  </FilterSelect>
+                  </FilterSelect> */}
                 </ControlsLeft>
                 <ControlsRight>
                   <SortButton
@@ -648,6 +731,7 @@ const MyBookings = () => {
                       layout
                     >
                       <BookingHeader>
+                        {/* <div> */}
                         <BookingNumber>
                           #
                           {((currentPage - 1) * itemsPerPage + idx + 1).toString().padStart(3, '0')}
@@ -655,6 +739,17 @@ const MyBookings = () => {
                         <BookingDate>
                           Booked: {format(new Date(booking.createdAt), 'dd MMM yyyy')}
                         </BookingDate>
+                        {/* </div> */}
+                        <StatusBadge
+                          status={booking.status || 'in progress'}
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ delay: idx * 0.1 + 0.3, type: 'spring', stiffness: 200 }}
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <StatusDot status={booking.status || 'in progress'} />
+                          {booking.status || 'In Progress'}
+                        </StatusBadge>
                       </BookingHeader>
 
                       <ServicesContainer>
@@ -684,7 +779,7 @@ const MyBookings = () => {
                       </BookingDetails>
 
                       <ViewButton
-                        onClick={() => navigate(`/booking/${booking._id}`)}
+                        onClick={() => navigate(`/dashboard/my-bookings/${booking._id}`)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >

@@ -16,6 +16,7 @@ import ForgotPasswordRequest from './pages/Auth/ForgotPasswordRequest'
 import UpdateProfile from './pages/Dashboard/UpdateProfile'
 import BookService from './pages/Dashboard/BookService'
 import MyBookings from './pages/Dashboard/MyBookings'
+import BookingDetails from './pages/Dashboard/BookingDetails'
 
 const LoadingFallback = () => (
   <div
@@ -52,6 +53,7 @@ function App() {
                   <Route path="update-profile" element={<UpdateProfile />} />
                   <Route path="book-service" element={<BookService />} />
                   <Route path="my-bookings" element={<MyBookings />} />
+                  <Route path="my-bookings/:bookingId" element={<BookingDetails />} />
                 </Route>
               </Routes>
             </Suspense>
