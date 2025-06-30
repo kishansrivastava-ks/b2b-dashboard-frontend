@@ -10,6 +10,265 @@ import { ArrowLeft } from 'lucide-react'
 
 const statusSteps = ['in progress', 'vendor assigned', 'work in progress', 'completed']
 
+const BookingDetails = () => {
+  const { bookingId } = useParams()
+  const navigate = useNavigate()
+
+  const {
+    data: booking,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['booking', bookingId],
+    queryFn: async () => {
+      const res = await api.get(`/service/my-bookings/${bookingId}`)
+      return res.data.booking
+    },
+  })
+
+  if (isLoading) {
+    return (
+      <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <ContentWrapper>
+          <LoadingContainer>
+            <Spinner />
+            <LoadingText>Loading booking details...</LoadingText>
+          </LoadingContainer>
+        </ContentWrapper>
+      </Container>
+    )
+  }
+
+  if (isError) {
+    toast.error(error?.response?.data?.message || 'Error fetching booking')
+    return (
+      <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <ContentWrapper>
+          <ErrorContainer>
+            <StatusEmoji>❌</StatusEmoji>
+            <ErrorText>Error loading booking details</ErrorText>
+          </ErrorContainer>
+        </ContentWrapper>
+      </Container>
+    )
+  }
+
+  const currentStep = statusSteps.indexOf(booking.status)
+  const progressPercentage = ((currentStep + 1) / statusSteps.length) * 100
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'completed':
+        return '✅'
+      case 'in progress':
+        return '⏳'
+      case 'work in progress':
+        return '🔧'
+      case 'vendor assigned':
+        return '👨‍🔧'
+      case 'confirmed':
+        return '✓'
+      case 'pending':
+        return '⏰'
+      default:
+        return '📋'
+    }
+  }
+
+  const getStatusMessage = (status) => {
+    switch (status) {
+      case 'completed':
+        return { type: 'completed', message: 'This booking has been successfully completed!' }
+      case 'in progress':
+        return { type: 'in-progress', message: 'Your booking is currently being processed.' }
+      case 'work in progress':
+        return { type: 'work-in-progress', message: 'Work is ongoing on your booking.' }
+      case 'vendor assigned':
+        return { type: 'vendor-assigned', message: 'A vendor has been assigned to your booking.' }
+      default:
+        return null
+    }
+  }
+
+  const statusMessage = getStatusMessage(booking.status)
+
+  return (
+    <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <ContentWrapper>
+        <BackButton
+          onClick={() => {
+            navigate('/dashboard/my-bookings')
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowLeft />
+        </BackButton>
+        <BookingCard
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <Header>
+            <Title
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Booking Details
+            </Title>
+            <BookingId
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              Booking ID: #{bookingId}
+            </BookingId>
+          </Header>
+
+          <StatusSection>
+            <StatusCard
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <CurrentStatus>
+                <StatusIcon
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6, type: 'spring' }}
+                >
+                  {getStatusIcon(booking.status)}
+                </StatusIcon>
+                <StatusBadge
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  {booking.status}
+                </StatusBadge>
+              </CurrentStatus>
+
+              <ProgressBar>
+                <ProgressLine />
+                <ProgressFill
+                  style={{ width: `${progressPercentage}%` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  transition={{ duration: 1, delay: 0.7 }}
+                />
+                <StepsContainer>
+                  {statusSteps.map((step, idx) => (
+                    <Step key={step}>
+                      <StepDot
+                        active={idx <= currentStep}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          duration: 0.3,
+                          delay: 0.8 + idx * 0.1,
+                          type: 'spring',
+                        }}
+                      >
+                        {idx + 1}
+                      </StepDot>
+                      <StepLabel active={idx <= currentStep}>{step}</StepLabel>
+                    </Step>
+                  ))}
+                </StepsContainer>
+              </ProgressBar>
+            </StatusCard>
+          </StatusSection>
+
+          <DetailsGrid>
+            <DetailCard
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+              whileHover={{ y: -2 }}
+            >
+              <DetailLabel>🛠️ Services</DetailLabel>
+              <DetailValue>{booking.services.join(', ')}</DetailValue>
+            </DetailCard>
+
+            <DetailCard
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.3 }}
+              whileHover={{ y: -2 }}
+            >
+              <DetailLabel>📅 Booking Date</DetailLabel>
+              <DetailValue>{format(new Date(booking.bookingDate), 'dd MMM yyyy')}</DetailValue>
+            </DetailCard>
+
+            <DetailCard
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.4 }}
+              whileHover={{ y: -2 }}
+            >
+              <DetailLabel>👤 New Customer</DetailLabel>
+              <DetailValue>{booking.newCustomer ? 'Yes' : 'No'}</DetailValue>
+            </DetailCard>
+
+            <DetailCard
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.5 }}
+              whileHover={{ y: -2 }}
+            >
+              <DetailLabel>➕ Additional Services</DetailLabel>
+              <DetailValue>{booking.additionalServices || 'None'}</DetailValue>
+            </DetailCard>
+          </DetailsGrid>
+
+          {['vendor assigned', 'work in progress', 'completed'].includes(booking.status) &&
+            booking.vendorName &&
+            booking.vendorContact && (
+              <VendorSection
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 1.6 }}
+              >
+                <VendorHeader>
+                  <VendorIcon>👨‍🔧</VendorIcon>
+                  <VendorTitle>Assigned Vendor</VendorTitle>
+                </VendorHeader>
+                <VendorCard>
+                  <VendorInfo>
+                    <VendorDetail>
+                      <VendorLabel>Name</VendorLabel>
+                      <VendorValue>{booking.vendorName}</VendorValue>
+                    </VendorDetail>
+                    <VendorDetail>
+                      <VendorLabel>Contact</VendorLabel>
+                      <VendorValue>{booking.vendorContact}</VendorValue>
+                    </VendorDetail>
+                  </VendorInfo>
+                </VendorCard>
+              </VendorSection>
+            )}
+
+          {statusMessage && (
+            <StatusMessage
+              type={statusMessage.type}
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.7 }}
+            >
+              <StatusEmoji>{getStatusIcon(booking.status)}</StatusEmoji>
+              {statusMessage.message}
+            </StatusMessage>
+          )}
+        </BookingCard>
+      </ContentWrapper>
+    </Container>
+  )
+}
+
+export default BookingDetails
+
 const Container = styled(motion.div)`
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -476,271 +735,3 @@ const ErrorText = styled.p`
   font-size: 1.125rem;
   font-weight: 600;
 `
-
-const BookingDetails = () => {
-  const { bookingId } = useParams()
-  const navigate = useNavigate()
-
-  const {
-    data: booking,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['booking', bookingId],
-    queryFn: async () => {
-      const res = await api.get(`/service/my-bookings/${bookingId}`)
-      return res.data.booking
-    },
-  })
-
-  if (isLoading) {
-    return (
-      <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <ContentWrapper>
-          <LoadingContainer>
-            <Spinner />
-            <LoadingText>Loading booking details...</LoadingText>
-          </LoadingContainer>
-        </ContentWrapper>
-      </Container>
-    )
-  }
-
-  if (isError) {
-    toast.error(error?.response?.data?.message || 'Error fetching booking')
-    return (
-      <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <ContentWrapper>
-          <ErrorContainer>
-            <StatusEmoji>❌</StatusEmoji>
-            <ErrorText>Error loading booking details</ErrorText>
-          </ErrorContainer>
-        </ContentWrapper>
-      </Container>
-    )
-  }
-
-  const currentStep = statusSteps.indexOf(booking.status)
-  const progressPercentage = ((currentStep + 1) / statusSteps.length) * 100
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return '✅'
-      case 'in progress':
-        return '⏳'
-      case 'work in progress':
-        return '🔧'
-      case 'vendor assigned':
-        return '👨‍🔧'
-      case 'confirmed':
-        return '✓'
-      case 'pending':
-        return '⏰'
-      default:
-        return '📋'
-    }
-  }
-
-  const getStatusMessage = (status) => {
-    switch (status) {
-      case 'completed':
-        return { type: 'completed', message: 'This booking has been successfully completed!' }
-      case 'in progress':
-        return { type: 'in-progress', message: 'Your booking is currently being processed.' }
-      case 'work in progress':
-        return { type: 'work-in-progress', message: 'Work is ongoing on your booking.' }
-      case 'vendor assigned':
-        return { type: 'vendor-assigned', message: 'A vendor has been assigned to your booking.' }
-      default:
-        return null
-    }
-  }
-
-  const statusMessage = getStatusMessage(booking.status)
-
-  return (
-    <Container initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-      <ContentWrapper>
-        <BackButton
-          onClick={() => {
-            navigate('/dashboard/my-bookings')
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ArrowLeft />
-        </BackButton>
-        <BookingCard
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <Header>
-            <Title
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Booking Details
-            </Title>
-            <BookingId
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              Booking ID: #{bookingId}
-            </BookingId>
-          </Header>
-
-          <StatusSection>
-            <StatusCard
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <CurrentStatus>
-                <StatusIcon
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6, type: 'spring' }}
-                >
-                  {getStatusIcon(booking.status)}
-                </StatusIcon>
-                <StatusBadge
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                >
-                  {booking.status}
-                </StatusBadge>
-              </CurrentStatus>
-
-              <ProgressBar>
-                <ProgressLine />
-                <ProgressFill
-                  style={{ width: `${progressPercentage}%` }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercentage}%` }}
-                  transition={{ duration: 1, delay: 0.7 }}
-                />
-                <StepsContainer>
-                  {statusSteps.map((step, idx) => (
-                    <Step key={step}>
-                      <StepDot
-                        active={idx <= currentStep}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{
-                          duration: 0.3,
-                          delay: 0.8 + idx * 0.1,
-                          type: 'spring',
-                        }}
-                      >
-                        {idx + 1}
-                      </StepDot>
-                      <StepLabel active={idx <= currentStep}>{step}</StepLabel>
-                    </Step>
-                  ))}
-                </StepsContainer>
-              </ProgressBar>
-            </StatusCard>
-          </StatusSection>
-
-          <DetailsGrid>
-            <DetailCard
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.2 }}
-              whileHover={{ y: -2 }}
-            >
-              <DetailLabel>🛠️ Services</DetailLabel>
-              <DetailValue>{booking.services.join(', ')}</DetailValue>
-            </DetailCard>
-
-            <DetailCard
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.3 }}
-              whileHover={{ y: -2 }}
-            >
-              <DetailLabel>📅 Booking Date</DetailLabel>
-              <DetailValue>{format(new Date(booking.bookingDate), 'dd MMM yyyy')}</DetailValue>
-            </DetailCard>
-
-            <DetailCard
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.4 }}
-              whileHover={{ y: -2 }}
-            >
-              <DetailLabel>👤 New Customer</DetailLabel>
-              <DetailValue>{booking.newCustomer ? 'Yes' : 'No'}</DetailValue>
-            </DetailCard>
-
-            <DetailCard
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.5 }}
-              whileHover={{ y: -2 }}
-            >
-              <DetailLabel>➕ Additional Services</DetailLabel>
-              <DetailValue>{booking.additionalServices || 'None'}</DetailValue>
-            </DetailCard>
-          </DetailsGrid>
-
-          {booking.status === 'vendor assigned' && booking.vendor && (
-            <VendorSection
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.6 }}
-            >
-              <VendorHeader>
-                <VendorIcon>👨‍🔧</VendorIcon>
-                <VendorTitle>Assigned Vendor</VendorTitle>
-              </VendorHeader>
-              <VendorCard>
-                <VendorImage
-                  src={booking.vendor.photo}
-                  alt={booking.vendor.name}
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/80x80?text=Vendor'
-                  }}
-                />
-                <VendorInfo>
-                  <VendorDetail>
-                    <VendorLabel>Name</VendorLabel>
-                    <VendorValue>{booking.vendor.name}</VendorValue>
-                  </VendorDetail>
-                  <VendorDetail>
-                    <VendorLabel>Contact</VendorLabel>
-                    <VendorValue>{booking.vendor.contact}</VendorValue>
-                  </VendorDetail>
-                  <VendorDetail>
-                    <VendorLabel>Category</VendorLabel>
-                    <VendorValue>{booking.vendor.category}</VendorValue>
-                  </VendorDetail>
-                </VendorInfo>
-              </VendorCard>
-            </VendorSection>
-          )}
-
-          {statusMessage && (
-            <StatusMessage
-              type={statusMessage.type}
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.7 }}
-            >
-              <StatusEmoji>{getStatusIcon(booking.status)}</StatusEmoji>
-              {statusMessage.message}
-            </StatusMessage>
-          )}
-        </BookingCard>
-      </ContentWrapper>
-    </Container>
-  )
-}
-
-export default BookingDetails

@@ -364,6 +364,27 @@ const DashboardLayout = () => {
                 </NavArrow>
               )}
             </NavItem>
+
+            <NavItem to="/dashboard/quotations">
+              <BookIcon />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <NavText
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Quotations
+                  </NavText>
+                )}
+              </AnimatePresence>
+              {!sidebarCollapsed && (
+                <NavArrow>
+                  <ChevronRightIcon size={16} />
+                </NavArrow>
+              )}
+            </NavItem>
           </Navigation>
 
           <LogoutButton
