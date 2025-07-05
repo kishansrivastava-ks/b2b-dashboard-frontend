@@ -18,6 +18,7 @@ import BookService from './pages/Dashboard/BookService'
 import MyBookings from './pages/Dashboard/MyBookings'
 import BookingDetails from './pages/Dashboard/BookingDetails'
 import QuotationsPage from './pages/Dashboard/PaymentsAndInvoices/QuotationsPage'
+import InvoicesPage from './pages/Dashboard/PaymentsAndInvoices/InvoicesPage'
 
 const LoadingFallback = () => (
   <div
@@ -56,6 +57,7 @@ function App() {
                   <Route path="my-bookings" element={<MyBookings />} />
                   <Route path="my-bookings/:bookingId" element={<BookingDetails />} />
                   <Route path="quotations" element={<QuotationsPage />} />
+                  <Route path="invoices" element={<InvoicesPage />} />
                 </Route>
               </Routes>
             </Suspense>

@@ -2,7 +2,20 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LogOutIcon, MenuIcon, UserIcon, ChevronRightIcon, BookIcon } from 'lucide-react'
+import {
+  LogOutIcon,
+  MenuIcon,
+  UserIcon,
+  ChevronRightIcon,
+  BookIcon,
+  CalendarCheck,
+  ClipboardList,
+  CalendarPlus,
+  Receipt,
+  ReceiptIndianRupeeIcon,
+  ReceiptIndianRupee,
+  FileCheck,
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
@@ -324,7 +337,7 @@ const DashboardLayout = () => {
               )}
             </NavItem>
             <NavItem to="/dashboard/book-service">
-              <BookIcon />
+              <CalendarPlus />
               <AnimatePresence>
                 {!sidebarCollapsed && (
                   <NavText
@@ -345,7 +358,7 @@ const DashboardLayout = () => {
             </NavItem>
 
             <NavItem to="/dashboard/my-bookings">
-              <BookIcon />
+              <CalendarCheck />
               <AnimatePresence>
                 {!sidebarCollapsed && (
                   <NavText
@@ -366,7 +379,7 @@ const DashboardLayout = () => {
             </NavItem>
 
             <NavItem to="/dashboard/quotations">
-              <BookIcon />
+              <FileCheck />
               <AnimatePresence>
                 {!sidebarCollapsed && (
                   <NavText
@@ -376,6 +389,27 @@ const DashboardLayout = () => {
                     transition={{ duration: 0.2 }}
                   >
                     Quotations
+                  </NavText>
+                )}
+              </AnimatePresence>
+              {!sidebarCollapsed && (
+                <NavArrow>
+                  <ChevronRightIcon size={16} />
+                </NavArrow>
+              )}
+            </NavItem>
+
+            <NavItem to="/dashboard/invoices">
+              <ReceiptIndianRupee />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <NavText
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Invoices
                   </NavText>
                 )}
               </AnimatePresence>
@@ -418,7 +452,11 @@ const DashboardLayout = () => {
         >
           <HeaderTitle>Welcome to Your Dashboard</HeaderTitle>
           <HeaderActions>
-            <UserAvatar whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <UserAvatar
+              onClick={() => navigate('/dashboard/profile')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <UserIcon size={20} />
             </UserAvatar>
           </HeaderActions>
