@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { User, Mail, Phone, Building, FileText, Calendar, Settings, Edit } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import api from '@/services/api'
+import FeedbackFormModal from '@/components/FeedbackFormModal'
 
 const formatDate = (iso) => new Date(iso).toLocaleDateString()
 
@@ -250,9 +252,55 @@ const Profile = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  const [serviceBookings, setServiceBookings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [selectedServiceForFeedback, setSelectedServiceForFeedback] = useState(null)
+
+  useEffect(() => {
+    fetchServiceBookings()
+  }, [])
+
   if (!user) {
     toast.error('No user found')
     return null
+  }
+
+  const fetchServiceBookings = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get('/service/my-bookings')
+      setServiceBookings(res.data.bookings)
+
+      // Check for completed services without feedback
+      const pendingFeedbackServices = res.data.bookings.filter(
+        (booking) => booking.status === 'completed' && !booking.feedbackProvided
+      )
+      if (pendingFeedbackServices.length > 0) {
+        setSelectedServiceForFeedback(pendingFeedbackServices[0]) // Show feedback for the first one
+        setShowFeedbackModal(true)
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to fetch service bookings.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOpenFeedbackModal = (service) => {
+    setSelectedServiceForFeedback(service)
+    setShowFeedbackModal(true)
+  }
+
+  const handleCloseFeedbackModal = () => {
+    setShowFeedbackModal(false)
+    setSelectedServiceForFeedback(null)
+  }
+
+  const handleFeedbackSubmitSuccess = () => {
+    // Re-fetch bookings to update the feedbackProvided status
+    fetchServiceBookings()
   }
 
   const containerVariants = {
@@ -403,6 +451,14 @@ const Profile = () => {
           </ActionButton>
         </ButtonGroup>
       </ProfileContainer>
+
+      {showFeedbackModal && selectedServiceForFeedback && (
+        <FeedbackFormModal
+          serviceBooking={selectedServiceForFeedback}
+          onClose={handleCloseFeedbackModal}
+          onSubmitSuccess={handleFeedbackSubmitSuccess}
+        />
+      )}
     </ProfilePageContainer>
   )
 }
