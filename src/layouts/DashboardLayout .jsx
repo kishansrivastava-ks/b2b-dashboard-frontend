@@ -15,6 +15,7 @@ import {
   ReceiptIndianRupeeIcon,
   ReceiptIndianRupee,
   FileCheck,
+  HelpCircle,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
@@ -410,6 +411,27 @@ const DashboardLayout = () => {
                     transition={{ duration: 0.2 }}
                   >
                     Invoices
+                  </NavText>
+                )}
+              </AnimatePresence>
+              {!sidebarCollapsed && (
+                <NavArrow>
+                  <ChevronRightIcon size={16} />
+                </NavArrow>
+              )}
+            </NavItem>
+
+            <NavItem to="/dashboard/support">
+              <HelpCircle />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <NavText
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Help and Support
                   </NavText>
                 )}
               </AnimatePresence>
